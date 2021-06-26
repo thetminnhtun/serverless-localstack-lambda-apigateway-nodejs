@@ -1,0 +1,26 @@
+service: lambda
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    debug: true
+    stages:
+      - local
+      - dev
+    endpointFile: localstack_endpoints.json
+
+frameworkVersion: "2"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+
+functions:
+  handler:
+    handler: app.handler
+    events:
+      - http:
+          path: /
+          method: get

@@ -1,0 +1,38 @@
+version: "3.1"
+
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:latest
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - SERVICES=lambda,s3,cloudformation,sts,apigateway,iam,route53
+      # - LAMBDA_EXECUTOR=docker
+      # - LAMBDA_REMOTE_DOCKER=true
+      # - LAMBDA_REMOVE_CONTAINERS=true
+      # - DATA_DIR=/temp/localstack/data
+      # - DEBUG=1
+      # - DOCKER_HOST=unix:///var/run/docker.sock
+    ports:
+      # - "443:443"
+      # - "4510-4520:4510-4520"
+      - "4566-4597:4566-4597"
+    volumes:
+      - "${TEMPDIR:-/tmp/localstack}:/temp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - localstack
+  test-lambda:
+    container_name: test-lambda
+    build:
+      context: ./src
+    ports:
+      - "9000:8080"
+    networks:
+      - localstack
+networks:
+  localstack:
+    external: false
+    driver: bridge
+    name: localstack
